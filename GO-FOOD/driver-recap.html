@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekap Pendapatan Driver - GoFood</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+  <div class="header">
+    <h2>👥 Rekap Pendapatan Driver</h2>
+    <div>
+      <button class="btn btn-secondary" onclick="window.location.href='all-orders.html'">📊 Lihat Pesanan</button>
+      <button class="btn btn-logout" onclick="logout()" style="margin-left: 10px;">Logout</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Driver Aktif Bekerja</h3>
+      <div class="stat-value" id="activeDrivers">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Total Pengiriman</h3>
+      <div class="stat-value" id="totalDeliveries">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Total Kompensasi</h3>
+      <div class="stat-value" style="color: #4caf50;" id="totalEarnings">Rp 0</div>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    ℹ️ Setiap driver menerima kompensasi sebesar 15% dari total pesanan yang diantarkan
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Driver</th>
+          <th>Status</th>
+          <th>Total Pengiriman</th>
+          <th>Total Pendapatan</th>
+          <th>Rata-rata per Pengiriman</th>
+        </tr>
+      </thead>
+      <tbody id="driverTable">
+        <tr>
+          <td colspan="5" style="text-align: center; color: #999;">Belum ada data driver</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button class="btn" onclick="window.location.href='order.html'">🍔 Buat Pesanan Baru</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+function init() {
+  const driverData = getDriverData();
+  
+  if (driverData.length === 0) {
+    return;
+  }
+  
+  // Calculate statistics
+  const activeDrivers = driverData.length;
+  const totalDeliveries = driverData.reduce((sum, driver) => sum + driver.totalOrders, 0);
+  const totalEarnings = driverData.reduce((sum, driver) => sum + driver.totalEarnings, 0);
+  
+  document.getElementById('activeDrivers').textContent = activeDrivers;
+  document.getElementById('totalDeliveries').textContent = totalDeliveries;
+  document.getElementById('totalEarnings').textContent = `Rp ${totalEarnings.toLocaleString('id-ID')}`;
+  
+  // Sort drivers by earnings (highest first)
+  driverData.sort((a, b) => b.totalEarnings - a.totalEarnings);
+  
+  // Display driver table
+  const driverTable = document.getElementById('driverTable');
+  driverTable.innerHTML = '';
+  
+  driverData.forEach(driver => {
+    const avgPerDelivery = driver.totalOrders > 0 ? driver.totalEarnings / driver.totalOrders : 0;
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td style="font-weight: 600;">${driver.name}</td>
+      <td>
+        <span class="badge ${driver.isActive ? 'badge-success' : 'badge-danger'}">
+          ${driver.isActive ? '🟢 Aktif' : '🔴 Tidak Aktif'}
+        </span>
+      </td>
+      <td style="text-align: center;">${driver.totalOrders} pengiriman</td>
+      <td style="font-weight: 600; color: #4caf50;">Rp ${driver.totalEarnings.toLocaleString('id-ID')}</td>
+      <td style="color: #666;">Rp ${Math.round(avgPerDelivery).toLocaleString('id-ID')}</td>
+    `;
+    
+    // Add click event to show detail
+    row.style.cursor = 'pointer';
+    row.onclick = () => showDriverDetail(driver);
+    
+    driverTable.appendChild(row);
+  });
+}
+
+function showDriverDetail(driver) {
+  let detail = `📊 Detail ${driver.name}\n\n`;
+  detail += `Status: ${driver.isActive ? '🟢 Aktif' : '🔴 Tidak Aktif'}\n`;
+  detail += `Total Pengiriman: ${driver.totalOrders}\n`;
+  detail += `Total Pendapatan: Rp ${driver.totalEarnings.toLocaleString('id-ID')}\n\n`;
+  
+  if (driver.orderHistory.length > 0) {
+    detail += `Riwayat Pesanan:\n`;
+    driver.orderHistory.forEach(order => {
+      detail += `\n• Pesanan #${order.id}\n`;
+      detail += `  Pelanggan: ${order.customer}\n`;
+      detail += `  Total: Rp ${order.total.toLocaleString('id-ID')}\n`;
+      detail += `  Kompensasi: Rp ${order.driverFee.toLocaleString('id-ID')}\n`;
+      detail += `  Waktu: ${order.timestamp}`;
+    });
+  }
+  
+  alert(detail);
+}
+
+// Initialize on load
+init();
+</script>
+
+</body>
+</html>

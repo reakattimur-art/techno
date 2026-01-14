@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semua Pesanan - GoFood</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+  <div class="header">
+    <h2>📊 Semua Pesanan</h2>
+    <div>
+      <button class="btn btn-secondary" onclick="viewDriverRecap()">👥 Rekap Driver</button>
+      <button class="btn btn-logout" onclick="logout()" style="margin-left: 10px;">Logout</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Total Pesanan</h3>
+      <div class="stat-value" id="totalOrders">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Total Pendapatan</h3>
+      <div class="stat-value" style="color: #ff6f3c;" id="totalRevenue">Rp 0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Total Kompensasi Driver</h3>
+      <div class="stat-value" style="color: #4caf50;" id="totalDriverFees">Rp 0</div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pelanggan</th>
+          <th>Driver</th>
+          <th>Jumlah Item</th>
+          <th>Total</th>
+          <th>Kompensasi Driver</th>
+          <th>Waktu</th>
+        </tr>
+      </thead>
+      <tbody id="ordersTable">
+        <tr>
+          <td colspan="7" style="text-align: center; color: #999;">Belum ada pesanan</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button class="btn" onclick="window.location.href='order.html'">🍔 Buat Pesanan Baru</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+function init() {
+  const orders = getAllOrders();
+  
+  if (orders.length === 0) {
+    return;
+  }
+  
+  // Calculate statistics
+  const totalOrders = orders.length;
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalDriverFees = orders.reduce((sum, order) => sum + order.driverFee, 0);
+  
+  document.getElementById('totalOrders').textContent = totalOrders;
+  document.getElementById('totalRevenue').textContent = `Rp ${totalRevenue.toLocaleString('id-ID')}`;
+  document.getElementById('totalDriverFees').textContent = `Rp ${totalDriverFees.toLocaleString('id-ID')}`;
+  
+  // Display orders table
+  const ordersTable = document.getElementById('ordersTable');
+  ordersTable.innerHTML = '';
+  
+  orders.forEach(order => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>#${order.id}</td>
+      <td>${order.customer}</td>
+      <td>${order.driver}</td>
+      <td>${order.items.length} item</td>
+      <td style="font-weight: 600; color: #ff6f3c;">Rp ${order.total.toLocaleString('id-ID')}</td>
+      <td style="font-weight: 600; color: #4caf50;">Rp ${order.driverFee.toLocaleString('id-ID')}</td>
+      <td style="font-size: 13px;">${order.timestamp}</td>
+    `;
+    ordersTable.appendChild(row);
+  });
+}
+
+function viewDriverRecap() {
+  window.location.href = 'driver-recap.html';
+}
+
+// Initialize on load
+init();
+</script>
+
+</body>
+</html>

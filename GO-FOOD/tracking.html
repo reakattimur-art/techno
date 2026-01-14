@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lacak Pesanan - GoFood</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+  <div class="header">
+    <h2>🚚 Lacak Pesanan</h2>
+  </div>
+
+  <div class="tracking-section">
+    <div class="tracking-status">🛵</div>
+    <div class="tracking-text">
+      <strong id="trackingDriver"></strong> sedang mengantar pesanan Anda
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    <p style="color: #999; font-size: 14px; margin-top: 20px;">
+      ⏱️ Estimasi waktu: 15-20 menit
+    </p>
+    
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 20px; text-align: left;">
+      <h4 style="margin-bottom: 10px; color: #333;">📋 Info Pesanan</h4>
+      <div style="font-size: 14px; color: #666;">
+        <div style="margin-bottom: 5px;">Total Item: <strong id="totalItems"></strong></div>
+        <div style="margin-bottom: 5px;">Total Bayar: <strong id="totalPayment" style="color: #ff6f3c;"></strong></div>
+        <div>Kompensasi Driver: <strong id="driverEarning" style="color: #4caf50;"></strong></div>
+      </div>
+    </div>
+    
+    <button class="btn" style="margin-top: 30px; max-width: 400px; width: 100%;" onclick="completeOrder()">
+      ✅ Pesanan Selesai Diterima
+    </button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+function init() {
+  const order = getLastOrder();
+  
+  if (!order) {
+    alert('Tidak ada pesanan aktif.');
+    window.location.href = 'order.html';
+    return;
+  }
+  
+  document.getElementById('trackingDriver').textContent = order.driver;
+  document.getElementById('totalItems').textContent = `${order.items.length} item`;
+  document.getElementById('totalPayment').textContent = `Rp ${order.total.toLocaleString('id-ID')}`;
+  document.getElementById('driverEarning').textContent = `Rp ${order.driverFee.toLocaleString('id-ID')}`;
+}
+
+function completeOrder() {
+  window.location.href = 'recap.html';
+}
+
+// Initialize on load
+init();
+</script>
+
+</body>
+</html>
